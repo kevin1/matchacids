@@ -1,5 +1,6 @@
 #include <stdio.h>  // Not using iostream for Linux compatibility.
 #include <string.h> // So that we can use strcmp() on Linux.
+#include <stdlib.h> // Use exit() on Linux.
 #include <vector>   // Arrays of dynamic length
 #include <sstream>  // Convert between strings and numbers
 #include <stdarg.h> // Functions that take variable number of arguments
