@@ -21,6 +21,10 @@ public:
 		return to_str;
 	}
 	
+	bool equalTo(AminoAcid other) {
+		return (resid == other.resid && chain == other.chain);
+	}
+	
 	std::string to_cdd() {
 		// TODO
 		std::string to_str = "unimplemented";
@@ -46,6 +50,11 @@ public:
 		return to_str;
 	}
 private:
+};
+
+struct ProteinFile {
+	FILE* file;
+	unsigned int format;
 };
 
 /* GLOBAL VARIABLES */
@@ -80,6 +89,7 @@ void print_help();
 void debug(const char* format, ...);
 
 void load_acids1();
+unsigned int search_acids1(AminoAcid target);
 void compare_acids2();
 
 void print_acids();
@@ -137,20 +147,56 @@ void debug(const char* format, ...) {
 	}
 }
 
+ProteinFile open_proteinfile(std::string path) {
+	ProteinFile pf;
+	
+	debug("Opening file %s\n", path.c_str());
+	pf.file = fopen(path.c_str(), "r");
+	// fopen() returns null if it can't open the file for whatever reason.
+	if (pf.file == NULL) {
+		printf("error: can't open input file: %s\n", path.c_str());
+		exit(1);
+	}
+	
+	// Finds the first instance of '.' after index 0.
+	unsigned int format_ext_start = path.find_first_of('.', 0) + 1;
+	
+	// Grab the 3 characters after the first '.'
+	std::string format_ext = path.substr(format_ext_start, 3);
+	debug("identified format string as %s at index %d\n", format_ext.c_str(), format_ext_start);
+	if (format_ext == "vmd") {
+		pf.format = form_vmd;
+	}
+	else if (format_ext == "mtp") {
+		pf.format = form_metapocket;
+	}
+	else if (format_ext == "cdd") {
+		pf.format = form_cdd;
+	}
+	else {
+		printf("error: invalid acid format extension for %s\n", path.c_str());
+		exit(3);
+	}
+	
+	debug("format ID for this file is %d\n", pf.format);
+	
+	return pf;
+}
+
 // Grab acids from the first file and throw them into the acids1 vector.
 void load_acids1() {
-	debug("Opening file\n");
-	FILE* infile = fopen(path_in.c_str(), "r");
-	// fopen() returns null if it can't open the file for whatever reason.
-	if (infile == NULL) {
-		printf("error: can't open input file: %s\n", path_in.c_str());
-		exit(1);
+	// Open the file using the method
+	ProteinFile file_acids1 = open_proteinfile(input1_path);
+	
+	if (file_acids1.format != form_vmd) {
+		printf("error: file1 must be in VMD format.\n");
+		exit(5);
 	}
 	
 	// Loop while we hit an end-of-file (EOF) character.
 	// i isn't declared with the for loop because we want to access it later.
 	unsigned int i;
-	for (i = 0; feof(infile) == 0; i++) {
+	for (i = 0; feof(file_acids1.file) == 0; i++) {
 		// Store the next line of the file.
 		debug("Loading next line\n");
 		
@@ -165,7 +211,7 @@ void load_acids1() {
 		char chain1, chain2;
 		
 		// Use fscanf to extract formatted data from the file.
-		int fscanresult = fscanf(infile, "%3s%u_chain%c-%3s%u_chain%c", 
+		int fscanresult = fscanf(file_acids1.file, "%3s%u_chain%c-%3s%u_chain%c", 
 			resname1, &resid1, &chain1, resname2, &resid2, &chain2);
 		
 		// Save our data into an AminoAcidRange object.
@@ -182,21 +228,27 @@ void load_acids1() {
 		debug("Parsed acid range: %s\n", temp_range.to_metapocket().c_str());
 		
 		// Add this amino acid to the list
-		acids.push_back(temp_range);
+		acids1.push_back(temp_range);
 		debug("\n");
 	}
 	
 	// Delete the last item.
 	// Weird off-by-one error where the last entry is repeated.
-	acids.pop_back();
+	acids1.pop_back();
 	
 	// Always clean up your toys when you're done playing with them.
 	debug("Closing file\n");
-	fclose(infile);
+	fclose(file_acids1.file);
 	
 	// TODO: acid count isn't correct because fscanf() freaks out when we 
 	// have trailing hyphens.
 	debug("Parsed %d acids\n", i);
+}
+
+unsigned int search_acids1(AminoAcid target) {
+	unsigned int depends;
+	
+	return depends;
 }
 
 void compare_acids2() {
