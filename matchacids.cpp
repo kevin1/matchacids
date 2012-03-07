@@ -245,15 +245,83 @@ void load_acids1() {
 	debug("Parsed %d acids\n", i);
 }
 
+// Returns the index of the first acids1 element that matches AminoAcid.
+// Returns NULL if it wasn't found.
 unsigned int search_acids1(AminoAcid target) {
 	unsigned int depends;
-	
-	return depends;
+	// TODO: write code for searching for acids
+	return NULL;
 }
 
 void compare_acids2() {
 	// TODO: load the second file and find the common acids
 	printf("Unimplemented compare_acids2();\n");
+	
+	ProteinFile file_acids2 = open_proteinfile(input2_path);
+	
+	// Tracks whether we're in a block, per the block strategy outlined below.
+	bool mtp_inblock = false;
+	// Stores each block.
+	std::string buffer;
+	
+	// Loop while we hit an end-of-file (EOF) character.
+	// i isn't declared with the for loop because we want to access it later.
+	unsigned int i;
+	for (i = 0; feof(file_acids2.file) == 0; i++) {
+		// Pull a character from the file.
+		char c = fgetc(file_acids2.file);
+		
+		// Stores amino acid data so that we can search for it in acids1 later.
+		AminoAcid temp_acid;
+		
+		switch (file_acids2.format) {
+			case form_metapocket:
+				// Strategy: parse everything into space-delimited blocks. Whenever we have
+				// a block, parse it using sscanf().
+				if (!mtp_inblock && c != ' ') {					
+					// The _scanf() functions can't write to C++ string objects. 
+					// So we need this temp variable.
+					char resname[4];
+					resname[3] = '\0';
+					
+					// Pull data from the buffer
+					debug("Parsing buffer %s\n", buffer.c_str());
+					sscanf(buffer.c_str(), "%3s_%c^%d^", resname, &(temp_acid.chain), &(temp_acid.resid));
+					temp_acid.resname = resname;
+					debug("Parsed acid %s\n\n", temp_acid.to_metapocket().c_str());
+					
+					// We want to reuse the buffer variable for each block.
+					buffer.clear();
+				}
+				if (c == ' ' && mtp_inblock) {
+					mtp_inblock = false;
+					debug("leaving block\n");
+				}
+				if (c != ' ' && !mtp_inblock) {
+					mtp_inblock = true;
+					debug("entering block\n");
+				}
+				if (mtp_inblock) {
+					buffer.push_back(c);
+				}
+				break;
+				
+			case form_cdd:
+				
+				break;
+				
+			default:
+				printf("error: file2 must be in CDD or MTP format.\n");
+				exit(6);
+				break;
+		}
+		
+		// TODO: Search for temp_acid in acids1 vector.
+	}
+	
+	// Always clean up your toys when you're done playing with them.
+	debug("Closing file\n");
+	fclose(file_acids2.file);
 }
 
 // TODO do we still need the next 3 functions? Perhaps to modify them?
