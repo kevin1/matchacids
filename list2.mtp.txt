@@ -1,2 +1,2 @@
 RESI      ASP_I^412^    TRP_C^322^    SER_A^115^    LEU_A^116^    LYS_A^117^ 
-RESI      PRO_I^413^    ARG^H^335^    LYS_D^223^    
+RESI      PRO_I^413^    ARG_H^335^    LYS_D^223^    
