@@ -22,8 +22,15 @@ public:
 		return to_str;
 	}
 	
-	bool equalTo(AminoAcid other) {
+	// The next two overloaded operators provide a way to compare AminoAcid
+	// objects using == and != operators.
+	bool operator==(const AminoAcid &other) const {
 		return (resid == other.resid && chain == other.chain);
+	}
+	
+	bool operator!=(const AminoAcid &other) const {
+		// Returns the opposite of the == overloaded operator.
+		return !(*this == other);
 	}
 	
 	std::string to_cdd() {
@@ -235,8 +242,14 @@ void load_acids1() {
 // Returns the index of the first acids1 element that matches AminoAcid.
 // Returns NULL if it wasn't found.
 unsigned int search_acids1(AminoAcid target) {
-	unsigned int depends;
-	// TODO: write code for searching for acids
+	// Traverse the acids1 vector.
+	for (unsigned int i = 0; i < acids1.size(); i++) {
+		if (acids1[i] == target) {
+			// Hey, we found the first instance! Return the index.
+			return i;
+		}
+	}
+	// We didn't find the acid. Return NULL.
 	return NULL;
 }
 
