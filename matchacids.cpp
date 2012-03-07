@@ -34,25 +34,6 @@ public:
 private:
 };
 
-// Stores two AminoAcid objects.
-class AminoAcidRange {
-public:
-	AminoAcid a;
-	AminoAcid b;
-	
-	std::string to_metapocket() {
-		// Get the string representations of the two acids.
-		std::string to_str = a.to_metapocket() + "-" + b.to_metapocket();
-		return to_str;
-	}
-	
-	std::string to_cdd() {
-		std::string to_str = a.to_cdd() + "-" + b.to_cdd();
-		return to_str;
-	}
-private:
-};
-
 struct ProteinFile {
 	FILE* file;
 	unsigned int format;
@@ -60,7 +41,7 @@ struct ProteinFile {
 
 /* GLOBAL VARIABLES */
 // Stores the list of acids.
-std::vector<AminoAcidRange> acids1;
+std::vector<AminoAcid> acids1;
 
 // Stores the paths of the 2 files that we take as input.
 std::string input1_path, input2_path;
@@ -215,21 +196,26 @@ void load_acids1() {
 		int fscanresult = fscanf(file_acids1.file, "%3s%u_chain%c-%3s%u_chain%c", 
 			resname1, &resid1, &chain1, resname2, &resid2, &chain2);
 		
-		// Save our data into an AminoAcidRange object.
-		AminoAcidRange temp_range;
-		temp_range.a.resname = resname1;
-		temp_range.a.resid = resid1;
-		temp_range.a.chain = chain1;
+		// Save our data into a AminoAcid objects.
+		AminoAcid a, b;
+		a.resname = resname1;
+		a.resid = resid1;
+		a.chain = chain1;
 		
-		temp_range.b.resname = resname2;
-		temp_range.b.resid = resid2;
-		temp_range.b.chain = chain2;
+		b.resname = resname2;
+		b.resid = resid2;
+		b.chain = chain2;
 		
-		debug("Data: %s, %d, %c to %s, %d, %c\n", resname1, resid1, chain1, resname2, resid2, chain2);
-		debug("Parsed acid range: %s\n", temp_range.to_metapocket().c_str());
+		debug("Data: %s, %d, %c to %s, %d, %c\n", 
+			resname1, resid1, chain1, resname2, resid2, chain2);
+		debug("Parsed acids: %s\n", 
+			a.to_metapocket().c_str(), b.to_metapocket().c_str());
 		
 		// Add this amino acid to the list
-		acids1.push_back(temp_range);
+		acids1.push_back(a);
+		acids1.push_back(b);
+		
+		// Splits up the debug information for each line for easier reading.
 		debug("\n");
 	}
 	
