@@ -1,0 +1,5 @@
+The potential 10 ligand binding sites in your protein:
+--------------------------------------------------------------------------------
+HEADER binding site ID: 1
+RESI      ASP_I^412^    TRP_C^322^    SER_A^115^    LEU_A^116^    LYS_A^117^ 
+RESI      PRO_I^413^    ARG^H^335^    LYS_D^223^    

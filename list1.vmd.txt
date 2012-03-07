@@ -1,0 +1,3 @@
+ASP412_chainI-ARG335_chainH
+GLU268_chainE-LYS231_chainE
+GLU381_chainE-LYS207_chainE
