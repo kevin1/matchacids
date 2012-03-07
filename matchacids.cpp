@@ -275,6 +275,9 @@ void compare_acids2() {
 		AminoAcid temp_acid;
 		
 		switch (file_acids2.format) {
+			// TODO: Make sure to process each binding site separately. As in, try to
+			// match EVERY acid in a site to the list. We might need another vector to
+			// prevent cross-contamination of amino acids between binding sites.
 			case form_metapocket:
 				// Strategy: parse everything into space-delimited blocks. Whenever we have
 				// a block, parse it using sscanf().
