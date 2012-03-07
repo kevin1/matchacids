@@ -204,7 +204,7 @@ void load_acids1() {
 		// Grab the acid represented by the string.
 		debug("Parsing acid %d\n", i);
 		
-		// Some temporary variables to hold the data.	
+		// Some temporary variables to hold the data.
 		// TODO: Is it necessary to have a 4th character that's set to null?
 		char resname1[4], resname2[4];
 		resname1[3] = resname2[3] = '\0';
@@ -282,7 +282,7 @@ void compare_acids2() {
 			case form_metapocket:
 				// Strategy: parse everything into space-delimited blocks. Whenever we have
 				// a block, parse it using sscanf().
-				if (!mtp_inblock && c != ' ') {					
+				if (!mtp_inblock && c != ' ') {
 					// The _scanf() functions can't write to C++ string objects. 
 					// So we need this temp variable.
 					char resname[4];
@@ -290,9 +290,18 @@ void compare_acids2() {
 					
 					// Pull data from the buffer
 					debug("Parsing buffer %s\n", buffer.c_str());
-					sscanf(buffer.c_str(), "%3s_%c^%d^", resname, &(temp_acid.chain), &(temp_acid.resid));
-					temp_acid.resname = resname;
-					debug("Parsed acid %s\n\n", temp_acid.to_metapocket().c_str());
+					int scanf_result = sscanf(buffer.c_str(), "%3s_%c^%d^", 
+						resname, &(temp_acid.chain), &(temp_acid.resid));
+					
+					// Did sscanf() parse all 3 pieces of data?
+					if (scanf_result == 3) {
+						temp_acid.resname = resname;
+						debug("Parsed acid %s\n\n", temp_acid.to_metapocket().c_str());
+						// TODO: search for acid
+					}
+					else {
+						debug("sscanf failed (returned %d)\n", scanf_result);
+					}
 					
 					// We want to reuse the buffer variable for each block.
 					buffer.clear();
