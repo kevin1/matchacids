@@ -78,12 +78,9 @@ void print_help();
 void debug(const char* format, ...);
 
 void load_acids1();
-unsigned int search_acids1(AminoAcid target);
+int search_acids1(AminoAcid target);
 void compare_acids2();
-
-void print_acids();
-void write_acids();
-void output_acids(FILE* dest);
+void print_acid(std::string path, AminoAcid acid);
 
 /* MAIN */
 int main(int argc, const char* argv[]) {
@@ -152,7 +149,8 @@ ProteinFile open_proteinfile(std::string path) {
 	
 	// Grab the 3 characters after the first '.'
 	std::string format_ext = path.substr(format_ext_start, 3);
-	debug("identified format string as %s at index %d\n", format_ext.c_str(), format_ext_start);
+	debug("identified format string as %s at index %d\n", 
+		format_ext.c_str(), format_ext_start);
 	if (format_ext == "vmd") {
 		pf.format = form_vmd;
 	}
@@ -240,22 +238,23 @@ void load_acids1() {
 }
 
 // Returns the index of the first acids1 element that matches AminoAcid.
-// Returns NULL if it wasn't found.
-unsigned int search_acids1(AminoAcid target) {
+// Returns negative int if it wasn't found.
+int search_acids1(AminoAcid target) {
 	// Traverse the acids1 vector.
-	for (unsigned int i = 0; i < acids1.size(); i++) {
+	for (int i = 0; i < acids1.size(); i++) {
 		if (acids1[i] == target) {
+		//if (acids1[i].resid == target.resid && acids1[i].chain == target.chain) {
 			// Hey, we found the first instance! Return the index.
 			return i;
 		}
 	}
-	// We didn't find the acid. Return NULL.
-	return NULL;
+	// We didn't find the acid. Return -1.
+	return -1;
 }
 
 void compare_acids2() {
 	// TODO: load the second file and find the common acids
-	printf("Unimplemented compare_acids2();\n");
+	printf("Partially implemented compare_acids2();\n");
 	
 	ProteinFile file_acids2 = open_proteinfile(input2_path);
 	
@@ -288,22 +287,28 @@ void compare_acids2() {
 					resname[3] = '\0';
 					
 					// Pull data from the buffer
-					debug("Parsing buffer %s\n", buffer.c_str());
+					debug("\nParsing buffer %s\n", buffer.c_str());
 					int scanf_result = sscanf(buffer.c_str(), "%3s_%c^%d^", 
 						resname, &(temp_acid.chain), &(temp_acid.resid));
+						
+					// We want to reuse the buffer variable for each block.
+					buffer.clear();
 					
 					// Did sscanf() parse all 3 pieces of data?
 					if (scanf_result == 3) {
 						temp_acid.resname = resname;
-						debug("Parsed acid %s\n\n", temp_acid.to_metapocket().c_str());
-						// TODO: search for acid
+						debug("Parsed acid %s\n", temp_acid.to_metapocket().c_str());
+						
+						// Search for the acid and print it if found.
+						if (search_acids1(temp_acid) >= 0) {
+							debug("matched!\n");
+							print_acid("out.txt", temp_acid);
+						}
 					}
 					else {
 						debug("sscanf failed (returned %d)\n", scanf_result);
 					}
 					
-					// We want to reuse the buffer variable for each block.
-					buffer.clear();
 				}
 				if (c == ' ' && mtp_inblock) {
 					mtp_inblock = false;
@@ -336,46 +341,16 @@ void compare_acids2() {
 	fclose(file_acids2.file);
 }
 
-// TODO do we still need the next 3 functions? Perhaps to modify them?
-/*
-// Print the acids vector by saving its contents to stdout.
-void print_acids() {
-	debug("Printing to stdout\n");
-	printf("Parsed proteins:\n");
-	output_acids(stdout);
-}
-
-// Save the acids to the output file.
-void write_acids() {
-	FILE* writefile = fopen(path_out.c_str(), "w");
+void print_acid(std::string path, AminoAcid acid) {
+	FILE* writefile = fopen(path.c_str(), "a");
 	// fopen() returns null if it can't open the file for whatever reason.
 	if (writefile == NULL) {
-		printf("error: can't open file: %s\n", path_out.c_str());
+		printf("error: can't open file: %s\n", path.c_str());
 		return;
 	}
 	
-	debug("Saving to file %s\n", path_out.c_str());
-	output_acids(writefile);
+	fprintf(writefile, "%s\n", acid.to_metapocket().c_str());
+	
 	fclose(writefile);
 }
 
-// Write the acids to a specified output file. Assumes the FILE* is not null.
-// If we want to print them to the terminal, we pass stdout as the file.
-void output_acids(FILE* dest) {
-	// Traverse the acids vector.
-	for (int i = 0; i < acids.size(); i++) {
-		// Print the requested representation (a string) to a file called dest.
-		// TODO this code is no longer usable. 
-		switch (output_mode) {
-			case metapocket:
-				fprintf(dest, "%s\n", acids[i].to_metapocket().c_str());
-				break;
-			case cdd:
-				fprintf(dest, "%s\n", acids[i].to_cdd().c_str());
-				break;
-			default:
-				fprintf(dest, "invalid output_mode!\n");
-				break;
-		}
-	}
-}*/
