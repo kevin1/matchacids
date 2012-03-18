@@ -119,8 +119,11 @@ int main(int argc, const char* argv[]) {
 }
 
 void print_help() {
-	// TODO: write a help message
-	printf("Unimplemented\n");
+	printf("matchacids compares a VMD salt bridges output and a metapocket or CDD output.\n");
+	printf("It then saves the matching amino acids to out.txt.\n");
+	printf("\n");
+	printf("Usage: matchacids [vmd file] [mtp or cdd file] [-v]\n");
+	printf("Input files must have correct extensions. For example, input.vmd.txt for VMD.\n");
 }
 
 // Drop-in replacement for printf, but only prints when isDebug is true.
