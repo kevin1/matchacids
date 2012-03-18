@@ -36,9 +36,10 @@ public:
 private:
 };
 
+// Includes a format identifier for the file.
 struct ProteinFile {
 	FILE* file;
-	unsigned int format;
+	unsigned int format; // Value from the enum named formats.
 };
 
 /* GLOBAL VARIABLES */
@@ -52,6 +53,7 @@ std::string input1_path, input2_path;
 bool isDebug = false;
 
 /* ENUMERATIONS */
+// Keep track of indicies for the arguments that are passed into the program.
 enum arg_indicies {
 	i_command, // Ignored in parsing because this is the name of the program
 	i_input1,
@@ -60,6 +62,7 @@ enum arg_indicies {
 	arg_indicies_length // So that we can find the length of the enum without hardcoding it.
 };
 
+// Keep track of the formats that this program supports.
 enum formats {
 	form_vmd,
 	form_metapocket,
@@ -149,6 +152,8 @@ ProteinFile open_proteinfile(std::string path) {
 	std::string format_ext = path.substr(format_ext_start, 3);
 	debug("identified format string as %s at index %d\n", 
 		format_ext.c_str(), format_ext_start);
+	
+	// Set the correct format type using the format extension.
 	if (format_ext == "vmd") {
 		pf.format = form_vmd;
 	}
@@ -189,7 +194,6 @@ void load_acids1() {
 		debug("Parsing acid %d\n", i);
 		
 		// Some temporary variables to hold the data.
-		// TODO: Is it necessary to have a 4th character that's set to null?
 		char resname1[4], resname2[4];
 		resname1[3] = resname2[3] = '\0';
 		unsigned int resid1, resid2;
@@ -201,6 +205,7 @@ void load_acids1() {
 		
 		// Save our data into a AminoAcid objects.
 		AminoAcid a, b;
+		
 		a.resname = resname1;
 		a.resid = resid1;
 		a.chain = chain1;
@@ -218,7 +223,7 @@ void load_acids1() {
 		acids1.push_back(a);
 		acids1.push_back(b);
 		
-		// Splits up the debug information for each line for easier reading.
+		// Split up the debug information for each line for easier reading.
 		debug("\n");
 	}
 	
@@ -230,8 +235,6 @@ void load_acids1() {
 	debug("Closing file\n");
 	fclose(file_acids1.file);
 	
-	// TODO: acid count isn't correct because fscanf() freaks out when we 
-	// have trailing hyphens.
 	debug("Parsed %d acids\n", i);
 }
 
@@ -241,7 +244,6 @@ int search_acids1(AminoAcid target) {
 	// Traverse the acids1 vector.
 	for (int i = 0; i < acids1.size(); i++) {
 		if (acids1[i] == target) {
-		//if (acids1[i].resid == target.resid && acids1[i].chain == target.chain) {
 			// Hey, we found the first instance! Return the index.
 			return i;
 		}
@@ -272,15 +274,13 @@ void compare_acids2() {
 		bool parseOK = false;
 		
 		switch (file_acids2.format) {
-			// TODO: Make sure to process each binding site separately. As in, try to
-			// match EVERY acid in a site to the list. We might need another vector to
-			// prevent cross-contamination of amino acids between binding sites.
 			case form_metapocket:
 				// Strategy: parse everything into space-delimited blocks. Whenever we have
-				// a block, parse it using sscanf().
+				// a block, parse it using sscanf(). This probably isn't the cleanest way to
+				// implement.
 				if (!mtp_inblock && c != ' ') {
 					// The _scanf() functions can't write to C++ string objects. 
-					// So we need this temp variable.
+					// So we need this temporary C string.
 					char resname[4];
 					resname[3] = '\0';
 					
@@ -288,7 +288,7 @@ void compare_acids2() {
 					debug("\nParsing buffer %s\n", buffer.c_str());
 					int scanf_result = sscanf(buffer.c_str(), "%3s_%c^%d^", 
 						resname, &(temp_acid.chain), &(temp_acid.resid));
-						
+					
 					// We want to reuse the buffer variable for each block.
 					buffer.clear();
 					
@@ -340,6 +340,7 @@ void compare_acids2() {
 }
 
 void print_acid(std::string path, AminoAcid acid) {
+	// Open a file for appending.
 	FILE* writefile = fopen(path.c_str(), "a");
 	// fopen() returns null if it can't open the file for whatever reason.
 	if (writefile == NULL) {
