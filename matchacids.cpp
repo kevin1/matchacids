@@ -186,7 +186,7 @@ void load_acids1() {
 	// Loop while we hit an end-of-file (EOF) character.
 	// i isn't declared with the for loop because we want to access it later.
 	unsigned int i;
-	for (i = 0; feof(file_acids1.file) == 0; i++) {
+	for (i = 0; feof(file_acids1.file) == 0; i += 2) {
 		// Store the next line of the file.
 		debug("Loading next line\n");
 		
@@ -235,6 +235,7 @@ void load_acids1() {
 	debug("Closing file\n");
 	fclose(file_acids1.file);
 	
+	// Using i as the number of acids parsed isn't accurate all the time.
 	debug("Parsed %d acids\n", i);
 }
 
