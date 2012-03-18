@@ -216,7 +216,7 @@ void load_acids1() {
 		
 		debug("Data: %s, %d, %c to %s, %d, %c\n", 
 			resname1, resid1, chain1, resname2, resid2, chain2);
-		debug("Parsed acids: %s\n", 
+		debug("Parsed acids: %s %s\n", 
 			a.to_metapocket().c_str(), b.to_metapocket().c_str());
 		
 		// Add this amino acid to the list
