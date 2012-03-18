@@ -253,9 +253,6 @@ int search_acids1(AminoAcid target) {
 }
 
 void compare_acids2() {
-	// TODO: load the second file and find the common acids
-	printf("Partially implemented compare_acids2();\n");
-	
 	ProteinFile file_acids2 = open_proteinfile(input2_path);
 	
 	// Tracks whether we're in a block, per the block strategy outlined below.
@@ -272,6 +269,9 @@ void compare_acids2() {
 		
 		// Stores amino acid data so that we can search for it in acids1 later.
 		AminoAcid temp_acid;
+		
+		// Did the parsing succeed?
+		bool parseOK = false;
 		
 		switch (file_acids2.format) {
 			// TODO: Make sure to process each binding site separately. As in, try to
@@ -298,12 +298,7 @@ void compare_acids2() {
 					if (scanf_result == 3) {
 						temp_acid.resname = resname;
 						debug("Parsed acid %s\n", temp_acid.to_metapocket().c_str());
-						
-						// Search for the acid and print it if found.
-						if (search_acids1(temp_acid) >= 0) {
-							debug("matched!\n");
-							print_acid("out.txt", temp_acid);
-						}
+						parseOK = true;
 					}
 					else {
 						debug("sscanf failed (returned %d)\n", scanf_result);
@@ -324,7 +319,7 @@ void compare_acids2() {
 				break;
 				
 			case form_cdd:
-				
+				printf("error: cdd was not implemented.\n");
 				break;
 				
 			default:
@@ -333,7 +328,12 @@ void compare_acids2() {
 				break;
 		}
 		
-		// TODO: Search for temp_acid in acids1 vector.
+		// If the parse succeeded, search for the acid. If found, save it.
+		if (parseOK && search_acids1(temp_acid) >= 0) {
+			debug("matched!\n");
+			print_acid("out.txt", temp_acid);
+		}
+		
 	}
 	
 	// Always clean up your toys when you're done playing with them.
