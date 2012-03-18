@@ -13,7 +13,7 @@ public:
 	unsigned int resid;  // Amino acid number
 	char chain;          // Chain name
 	
-	std::string to_metapocket() {
+	std::string to_string() {
 		// Convert resid from int to string
 		std::stringstream resid_out;
 		resid_out << resid;
@@ -33,11 +33,6 @@ public:
 		return !(*this == other);
 	}
 	
-	std::string to_cdd() {
-		// TODO
-		std::string to_str = "unimplemented";
-		return to_str;
-	}
 private:
 };
 
@@ -217,7 +212,7 @@ void load_acids1() {
 		debug("Data: %s, %d, %c to %s, %d, %c\n", 
 			resname1, resid1, chain1, resname2, resid2, chain2);
 		debug("Parsed acids: %s %s\n", 
-			a.to_metapocket().c_str(), b.to_metapocket().c_str());
+			a.to_string().c_str(), b.to_string().c_str());
 		
 		// Add this amino acid to the list
 		acids1.push_back(a);
@@ -300,7 +295,7 @@ void compare_acids2() {
 					// Did sscanf() parse all 3 pieces of data?
 					if (scanf_result == 3) {
 						temp_acid.resname = resname;
-						debug("Parsed acid %s\n", temp_acid.to_metapocket().c_str());
+						debug("Parsed acid %s\n", temp_acid.to_string().c_str());
 						parseOK = true;
 					}
 					else {
@@ -352,7 +347,7 @@ void print_acid(std::string path, AminoAcid acid) {
 		return;
 	}
 	
-	fprintf(writefile, "%s\n", acid.to_metapocket().c_str());
+	fprintf(writefile, "%s\n", acid.to_string().c_str());
 	
 	fclose(writefile);
 }
