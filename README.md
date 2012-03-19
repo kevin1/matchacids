@@ -23,5 +23,6 @@ None! This program is public domain. Seriously.
 But if you do something cool with it, we'd love to see! Send us a link or something.
 
 # Developers
-Kevin Chen (@kevin1)
-Edward Wang (@drcaramelsyrup)
+Kevin Chen (@[kevin1](http://github.com/kevin1))
+
+Edward Wang (@[drcaramelsyrup](http://github.com/drcaramelsyrup))
